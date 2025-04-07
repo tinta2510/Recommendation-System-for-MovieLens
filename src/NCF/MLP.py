@@ -4,22 +4,25 @@ from torch.utils.data import DataLoader
 from utils import RatingDataset, train, evaluation
 from torch.utils.data import DataLoader
 
-class GMF(nn.Module):
-    """
-    
-    Note: Convert input user_id and item_id to 0-based indices
-    """
+class MLP(nn.Module):
     def __init__(self, 
                  n_users: int, 
                  n_items: int, 
-                 n_factors: bool, 
+                 hidden_layers: list[int],
                  for_NeuMF: bool = False):
         super().__init__()
         self.for_NeuMF = for_NeuMF
-        self.user_embed = nn.Embedding(n_users, n_factors)
-        self.item_embed = nn.Embedding(n_items, n_factors)
-        if not self.for_NeuMF:
-            self.linear = nn.Linear(n_factors, 1)
+        self.user_embed = nn.Embedding(n_users, hidden_layers[0]//2)
+        self.item_embed = nn.Embedding(n_items, hidden_layers[0]//2)
+        
+        mlp = []
+        for i in range(len(hidden_layers)-1):
+            mlp.append(nn.Linear(hidden_layers[i], hidden_layers[i+1]))
+            mlp.append(nn.ReLU())
+        
+        self.sequential = nn.Sequential(*mlp)
+        if not self.for_NeuMF: 
+            self.predict_layer = nn.Linear(hidden_layers[-1], 1)
             self.sigmoid = nn.Sigmoid()
         
         self._init_weight()
@@ -27,19 +30,25 @@ class GMF(nn.Module):
     def _init_weight(self):
         nn.init.normal_(self.user_embed.weight, std=0.01)
         nn.init.normal_(self.item_embed.weight, std=0.01)
-        if not self.for_NeuMF:
-            nn.init.xavier_normal_(self.linear.weight, gain=nn.init.calculate_gain('sigmoid'))
-    
+        for layer in self.sequential:
+            if isinstance(layer, nn.Linear):
+                nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+        if not self.for_NeuMF: 
+            nn.init.xavier_uniform_(self.predict_layer.weight, gain=nn.init.calculate_gain('sigmoid'))
+
     def forward(self, users, items):
+        # Apply 0-based indexing conversion
         users = users - 1
         items = items - 1
-        user_embeds = self.user_embed(users)
-        item_embeds = self.item_embed(items)
-        out = user_embeds * item_embeds
+        
+        user_embed = self.user_embed(users) # [batch_size, n_features]
+        item_embed = self.item_embed(items) # [batch_size, n_features]
+        concat_embed = torch.cat([user_embed, item_embed], dim=1)
+        output = self.sequential(concat_embed)
         if not self.for_NeuMF:
-            out = self.linear(out)
-            out = (self.sigmoid(out)*5).view(-1)
-        return out
+            output = self.predict_layer(output)
+            output = (self.sigmoid(output)*5).view(-1)
+        return output
 
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -54,11 +63,10 @@ if __name__=="__main__":
         training_dataloader = DataLoader(training_dataset, batch_size=32, shuffle=True)
         testing_dataloader = DataLoader(testing_dataset, batch_size=32, shuffle=False)
         
-        model = GMF(943, 1682, 64).to(device)
+        model = MLP(943, 1682, [128, 64, 32, 16, 8])
         criterion = nn.MSELoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         
         train(model, training_dataloader, criterion, optimizer, device)
         loss, rmse = evaluation(model, testing_dataloader, criterion, device)
         print(f"Dataset {i}: Loss: {loss}, RMSE: {rmse}")
-        

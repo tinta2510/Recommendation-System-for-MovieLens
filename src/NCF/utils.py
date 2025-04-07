@@ -26,24 +26,22 @@ def train(model: nn.Module,
           dataloader: DataLoader, 
           criterion: nn.Module, 
           optimizer: torch.optim.Optimizer, 
-          device: Union[torch.device, str]):
+          device: Union[torch.device, str],
+          epochs: int = 2):
     model.train()
-    for users, items, ratings in dataloader: 
-        users, items, ratings = users.to(device), items.to(device), ratings.to(device)
-        # Zero out the grad
-        optimizer.zero_grad()
-        
-        # Predict the ratings
-        outputs = model(users, items).reshape(-1)
-        
-        # Calculate loss
-        loss = criterion(outputs, ratings)
-        
-        # Calculate gradient descent
-        loss.backward()
-        
-        # Update weight
-        optimizer.step()
+    for _ in range(epochs):
+        for users, items, ratings in dataloader: 
+            users, items, ratings = users.to(device), items.to(device), ratings.to(device)
+            # Zero out the grad
+            optimizer.zero_grad()
+            # Predict the ratings
+            outputs = model(users, items)
+            # Calculate loss
+            loss = criterion(outputs, ratings)
+            # Calculate gradient descent
+            loss.backward()
+            # Update weight
+            optimizer.step()
 
 def evaluation(model: nn.Module, 
                dataloader: DataLoader, 
@@ -56,7 +54,7 @@ def evaluation(model: nn.Module,
         with torch.no_grad():
             for users, items, ratings in dataloader:
                 users, items, ratings = users.to(device), items.to(device), ratings.to(device)
-                outputs = model(users, items).reshape(-1)
+                outputs = model(users, items)
                 loss = criterion(outputs, ratings)
                 total_loss += loss
                 

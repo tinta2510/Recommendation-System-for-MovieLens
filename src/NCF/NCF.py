@@ -39,6 +39,8 @@ class NeuralCF(nn.Module):
         self.neuMF_layer = nn.Linear(n_factors_GMF + hidden_layers_MLP[-1], 1)
         self.sigmoid = nn.Sigmoid()
         
+        self._init_weight()
+        
     def _init_weight(self):
         nn.init.xavier_uniform_(self.neuMF_layer.weight, gain=nn.init.calculate_gain('sigmoid'))
     

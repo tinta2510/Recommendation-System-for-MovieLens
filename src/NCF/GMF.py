@@ -3,6 +3,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from utils import RatingDataset, train, evaluation
 from torch.utils.data import DataLoader
+learning_rate = 0.001
+n_factors = 32
 
 class GMF(nn.Module):
     """
@@ -43,7 +45,6 @@ class GMF(nn.Module):
 
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    learning_rate = 0.001
     for i in range(1, 6):
         training_filepath = f'./data/ml-100k/u{i}.base'
         testing_filepath = f'./data/ml-100k/u{i}.test'
@@ -54,11 +55,13 @@ if __name__=="__main__":
         training_dataloader = DataLoader(training_dataset, batch_size=32, shuffle=True)
         testing_dataloader = DataLoader(testing_dataset, batch_size=32, shuffle=False)
         
-        model = GMF(943, 1682, 64).to(device)
+        model = GMF(943, 1682, n_factors).to(device)
         criterion = nn.MSELoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         
         train(model, training_dataloader, criterion, optimizer, device)
+        loss, rmse = evaluation(model, training_dataloader, criterion, device)
+        print(f"Dataset {i} - Training: Loss: {loss}, RMSE: {rmse}")
         loss, rmse = evaluation(model, testing_dataloader, criterion, device)
-        print(f"Dataset {i}: Loss: {loss}, RMSE: {rmse}")
+        print(f"Dataset {i} - Testing: Loss: {loss}, RMSE: {rmse}")
         

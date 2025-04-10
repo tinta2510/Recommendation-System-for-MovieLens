@@ -23,6 +23,17 @@ Data has been loaded into dataframes using pandas. It had three main columns: us
 
 - The distribution of ratings is not uniform, with a higher concentration of ratings around the middle values (3-4).
 ![Rating distribution](images/rating-distribution.png)
+- Sparsity of the dataset: 0.937. The user-item interaction matrix is sparse, with many users rating only a few items. This sparsity can affect the performance of recommendation systems.
+- Average rating per user: The average ratings per user is around 3.5-4.0.
+![Average-rating-per-user](images/avg-rating-per-user.png)
+- Average rating per item: The average ratings per item is around 3-3.5.
+![Average-rating-per-item](images/avg-rating-per-item.png)
+- Genre of movies: Movies are categorized into different genres. The most common genres are Drama, Comedy, and Action.
+![num-movie-per-genre](images/num-movie-per-genre.png)
+- Average ratings per genre: The average ratings is uniform across genres.
+![avg-rating-per-genre](images/avg-rating-per-genre.png)
+
+
 
 ## References
 <span id="ref1">[1]</span> Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng Chua. 2017. Neural Collaborative Filtering. In Proceedings of the 26th International Conference on World Wide Web (WWW '17). International World Wide Web Conferences Steering Committee, Republic and Canton of Geneva, CHE, 173–182. https://doi.org/10.1145/3038912.3052569

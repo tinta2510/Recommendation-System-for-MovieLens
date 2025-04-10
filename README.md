@@ -8,6 +8,56 @@ The implemented methods include:
 - Matrix Factorization: Decomposes the user-item interaction matrix into lower-dimensional matrices to capture latent features.
 - Neural Collaborative Filtering (NCF): Combines Generalized Matrix Factorization (GMF) and Multi-Layer Perceptron (MLP) for a more expressive model, which can learn complex, non-linear user-item relations. [<a href="#ref1">1</a>]
 
+## Table of Contents
+- [Recommendation System on MovieLens dataset](#recommendation-system-on-movielens-dataset)
+  - [Project Overview](#project-overview)
+  - [Table of Contents](#table-of-contents)
+  - [Recommendation System](#recommendation-system)
+    - [Content-Based Filtering](#content-based-filtering)
+    - [Collaborative Filtering](#collaborative-filtering)
+    - [Deep Learning-based RS](#deep-learning-based-rs)
+  - [Dataset](#dataset)
+    - [Objective](#objective)
+    - [Data Exploration](#data-exploration)
+  - [Model Evaluation](#model-evaluation)
+  - [References](#references)
+
+## Recommendation System
+A recommendation system (RS) is a system that aim to predict the interaction between users and items. The interaction can be in the form of ratings, clicks, purchases, etc. For example, in case of MovieLens dataset, the recommendation system predicts the rating a user would give to a movie.
+
+There are two main types of recommendation systems: content-based filtering, collaborative filtering. In this project, we have implemented some recommendation systems of both types.
+
+### Content-Based Filtering
+Content-based filtering (CBF) recommends items similar to those the user liked in the past. The similarity between items is calculated based on their features (e.g., genre, director, origin). Example: If a user watched many action movies, recommend more action films.
+
+The CBF is a type of personalized recommendation system that utizies the explicit feature of items. However, it faces problems such as: computational cost (increseasing quadratically or cubically with the number of items), and a lack of item features.
+
+![content-based-filtering](images/content-based-filtering.png)\
+*Source:* [Blog](https://findoutyourfavorite.blogspot.com/2012/04/content-based-filtering.html)
+
+The implementation of CBF can be found in [src/content_based_recsys.py](src/content_based_recsys.py). 
+
+### Collaborative Filtering
+Collaborative filtering (CF) is a technique that predict the preferences of a user
+ based on the preferences of similar other users or the preferences of the same user on similar items. Example: Recommend items liked by other users who have similar ratings or behavior. 
+
+ Some example of collaborative filtering are:
+ - Memory-based CF: Neighbourhood-based CF (User-based CF, Item-based CF). These methods evaluate the similarity between users or items based on the given ratings.
+ - Model-based CF: Matrix factorization.  These methods learn latent factors representing user preferences and item characteristics. These methods decompose the
+ user-item interaction matrix into latent feature vectors for users and items 
+
+Some challenges: computational complexity and limited interpretability (which means it is hard to understand the reason behind the recommendation).
+
+The implementation of Neighbourhood-based CF can be found in [src/NBCF.py](src/NBCF.py). The implementation of matrix factorization can be found in [src/matrix_factorization_CF.py](src/matrix_factorization_CF.py). 
+
+### Deep Learning-based RS
+Traditional RS primarily use linear models like matrix factorization, which is hard to learn non-linear relationships. Deep learning-based RS leverage deep layers to learn complex, non-linear user-item interactions. Example: Neural Collaborative Filtering, Deep Factorization Machines.
+
+![NCF](images/NCF.png) \
+*Source:* [1]
+
+The implementation of NCF can be found in [src/NCF.py](src/NCF.py). 
+
 ## Dataset 
 This project uses the [MovieLens dataset](https://grouplens.org/datasets/movielens/) 100k dataset, a benchmark dataset widely used in academic research for evaluating recommender systems.
 - Contains 100,000 ratings (1–5 stars) from 943 users on 1682 movies.
@@ -30,9 +80,10 @@ Data has been loaded into dataframes using pandas. It had three main columns: us
 ![Average-rating-per-item](images/avg-rating-per-item.png)
 - Genre of movies: Movies are categorized into different genres. The most common genres are Drama, Comedy, and Action.
 ![num-movie-per-genre](images/num-movie-per-genre.png)
-- Average ratings per genre: The average ratings is uniform across genres.
+- Average ratings per genre: The average ratings is quiet uniform across genres.
 ![avg-rating-per-genre](images/avg-rating-per-genre.png)
 
+## Model Evaluation
 
 
 ## References

@@ -1,13 +1,15 @@
 import numpy as np
 import pandas as pd
 class MatrixFactorizationCF:
-    def __init__(self, k = 10, learning_rate=0.01, alpha  = 0.01):  
+    def __init__(self, n_users, n_items, k = 10, learning_rate=0.01, alpha  = 0.01):  
         """
         Args:
             k (int): number of latent vectors
             learning_rate (float):
         """
         self.k = k
+        self.n_users = n_users
+        self.n_items = n_items
         self.learning_rate = learning_rate
         self.alpha = alpha
         
@@ -17,9 +19,6 @@ class MatrixFactorizationCF:
             ratings (np.ndarray): column 0th (user), column 1st (item), column 2nd (rating)
         """
         self.ratings = ratings
-       
-        self.n_users = int(np.max(self.ratings[:, 0])) # User_id starts from 1
-        self.n_items = int(np.max(self.ratings[:, 1])) # Item_id starts from 1
         self.n_ratings = len(ratings)
         
         self._normalize_ratings()

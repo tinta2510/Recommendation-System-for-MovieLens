@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from utils import RatingDataset, train, evaluation
 from torch.utils.data import DataLoader
+
+from NCF.utils import RatingDataset, train, evaluate
+
 learning_rate = 0.001
 n_factors = 32
 
@@ -60,8 +62,8 @@ if __name__=="__main__":
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         
         train(model, training_dataloader, criterion, optimizer, device)
-        loss, rmse = evaluation(model, training_dataloader, criterion, device)
+        loss, rmse = evaluate(model, training_dataloader, criterion, device)
         print(f"Dataset {i} - Training: Loss: {loss}, RMSE: {rmse}")
-        loss, rmse = evaluation(model, testing_dataloader, criterion, device)
+        loss, rmse = evaluate(model, testing_dataloader, criterion, device)
         print(f"Dataset {i} - Testing: Loss: {loss}, RMSE: {rmse}")
         

@@ -29,7 +29,7 @@ def train(model: nn.Module,
           device: Union[torch.device, str],
           epochs: int = 2):
     model.train()
-    for _ in range(epochs):
+    for i in range(epochs):
         for users, items, ratings in dataloader: 
             users, items, ratings = users.to(device), items.to(device), ratings.to(device)
             # Zero out the grad
@@ -42,8 +42,10 @@ def train(model: nn.Module,
             loss.backward()
             # Update weight
             optimizer.step()
+        
+        print(f"Loss and RMSE after {i} epochs: ", evaluate(model, dataloader, criterion, device))
 
-def evaluation(model: nn.Module, 
+def evaluate(model: nn.Module, 
                dataloader: DataLoader, 
                criterion: nn.Module, 
                device: Union[torch.device, str]):     

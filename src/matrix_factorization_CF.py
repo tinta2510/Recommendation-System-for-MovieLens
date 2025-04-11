@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 class MatrixFactorizationCF:
-    def __init__(self, n_users, n_items, k = 10, learning_rate=0.01, alpha  = 0.01):  
+    def __init__(self, n_users, n_items, k = 10, learning_rate=1, alpha  = 0.01):  
         """
         Args:
             k (int): number of latent vectors
@@ -13,7 +13,7 @@ class MatrixFactorizationCF:
         self.learning_rate = learning_rate
         self.alpha = alpha
         
-    def fit(self, ratings, max_iter=10000):
+    def fit(self, ratings, epochs=10):
         """
         Args:
             ratings (np.ndarray): column 0th (user), column 1st (item), column 2nd (rating)
@@ -28,11 +28,11 @@ class MatrixFactorizationCF:
         # Item feature matrix K*N
         self.I = np.random.randn(self.k, self.n_items)
         
-        for i in range(max_iter):
+        for i in range(epochs):
             self._update_U()
             self._update_I()
-            if i  % 50 == 0:
-                print(f"RMSE after {i} iters: ", self.evaluate(ratings), "Loss: ", self.loss(ratings))
+            if i  % 10 == 0:
+                print(f"RMSE after {i} iters: ", self.evaluateRMSE(ratings), "Loss: ", self.loss(ratings))
             
     def predict(self, u_id, i_id):
         normalized_rating = self.U[u_id-1].dot(self.I[:, i_id-1])
@@ -46,7 +46,7 @@ class MatrixFactorizationCF:
         loss = L/(2*len(ratings)) + self.alpha/2*(np.linalg.norm(self.U) + np.linalg.norm(self.I))
         return loss
 
-    def evaluate(self, ratings):
+    def evaluateRMSE(self, ratings):
         mse = 0
         for u_id, i_id, rating in ratings:
             mse += (rating - self.predict(u_id, i_id))**2
@@ -79,6 +79,7 @@ class MatrixFactorizationCF:
             
     def _update_U(self):
         for m in range(self.n_users):
+            # Get item ids rated by user m+1
             item_ids, ratings = self._get_item_rated_by_user(m+1)
             # current predicted ratings
             ratings_m_hat = ratings - self.U[m].dot(self.I[:, item_ids-1])
@@ -88,19 +89,10 @@ class MatrixFactorizationCF:
     
     def _update_I(self):
         for n in range(self.n_items):
+            # Get user ids rated item n+1
             user_ids, ratings = self._get_user_rating_item(n)
+            # current predicted ratings
             ratings_n_hat = ratings - self.U[user_ids-1,:].dot(self.I[:,n])
             grad_in = (self.U[user_ids-1, :].T.dot(ratings_n_hat)/self.n_ratings 
                        + self.alpha*self.I[:, n])
             self.I[:, n] -= self.learning_rate*grad_in
-        
-for i in range(1, 6):
-    train_ratings = pd.read_csv(f'./data/ml-100k/u{i}.base', usecols=range(3),
-                                sep='\t', names=['user_id', 'item_id', 'rating'])
-    test_ratings = pd.read_csv(f'./data/ml-100k/u{i}.test', usecols=range(3),
-                                sep='\t', names=['user_id', 'item_id', 'rating'])
-    recommender = MatrixFactorizationCF(10, alpha=0.1, learning_rate=0.5)
-    recommender.fit(train_ratings.values, max_iter=100)
-    print(f"Evaluation of model on dataset {i}: ")
-    print("RMSE on training data: ", recommender.evaluate(train_ratings.values))
-    print("RMSE on testing data: ", recommender.evaluate(test_ratings.values))

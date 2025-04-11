@@ -20,6 +20,7 @@ The implemented methods include:
     - [Objective](#objective)
     - [Data Exploration](#data-exploration)
   - [Model Evaluation](#model-evaluation)
+  - [Future Work](#future-work)
   - [References](#references)
 
 ## Recommendation System
@@ -84,10 +85,35 @@ Data has been loaded into dataframes using pandas. It had three main columns: us
 ![avg-rating-per-genre](images/avg-rating-per-genre.png)
 
 ## Model Evaluation
+We evaluate the models using Root Mean Square Error (RMSE). It measures the average error between predicted and actual ratings. A lower RMSE indicates better performance. The RMSE is calculated using the following formula:
+$$RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$
+where $y_i$ is the actual rating, $\hat{y}_i$ is the predicted rating, and $n$ is the number of ratings.
 
+The experiments are conducted on the MovieLens 100k dataset, and the results are summarized in the table below:
+
+| Model                   | Train RMSE | Test RMSE |
+|-------------------------|------------|-----------|
+| user_based_CF           | 1.0474     | 1.0595    |
+| content_based_filtering | 0.9103     | 1.0543    |
+| matrix_factorization_CF | 1.0296     | 1.0437    |
+| item_based_CF           | 1.0154     | 1.0432    |
+| MLP                     | 0.8931     | 0.9389    |
+| GMF                     | 0.8287     | 0.9353    |
+| NCF                     | 0.8381     | 0.9212    |
+
+![evaluation](images/evaluation.png)
+
+The details of the experiments can be found in [src/experiments.ipynb](src/experiments.ipynb).
+
+The results show that NCF outperforms the other models in terms of RMSE. Other deep learning-based models like GMF and MLP also perform better than content-based filtering, neibourhood-based CF and matrix factorization. This indicates that deep learning-based models generalizes better to unseen data. This reusult is likely due to their ability to capture non-linear user-item interactions as compared to traditional methods.
+
+## Future Work
+In the future, I plan to implement some state-of-the-art recommendation systems utilizing graph learning techniques (e.g., [<a href="#ref2">2</a>]) or transformers. These approaches have shown promising results in recent research and could further enhance the performance of recommendation systems.
 
 ## References
 <span id="ref1">[1]</span> Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng Chua. 2017. Neural Collaborative Filtering. In Proceedings of the 26th International Conference on World Wide Web (WWW '17). International World Wide Web Conferences Steering Committee, Republic and Canton of Geneva, CHE, 173–182. https://doi.org/10.1145/3038912.3052569
+
+<span id="ref2">[2]</span> Zhang, M., & Chen, Y. (2019). Inductive matrix completion based on graph neural networks. arXiv preprint arXiv:1904.12058. https://doi.org/10.48550/arXiv.1904.12058
 
 
 

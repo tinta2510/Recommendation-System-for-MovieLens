@@ -1,8 +1,11 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from utils import RatingDataset, train, evaluation
 from torch.utils.data import DataLoader
+
+from NCF.utils import RatingDataset, train, evaluate
+
+learning_rate = 0.001
 
 class MLP(nn.Module):
     def __init__(self, 
@@ -52,7 +55,6 @@ class MLP(nn.Module):
 
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    learning_rate = 0.001
     for i in range(1, 6):
         training_filepath = f'./data/ml-100k/u{i}.base'
         testing_filepath = f'./data/ml-100k/u{i}.test'
@@ -68,5 +70,5 @@ if __name__=="__main__":
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         
         train(model, training_dataloader, criterion, optimizer, device)
-        loss, rmse = evaluation(model, testing_dataloader, criterion, device)
+        loss, rmse = evaluate(model, testing_dataloader, criterion, device)
         print(f"Dataset {i}: Loss: {loss}, RMSE: {rmse}")

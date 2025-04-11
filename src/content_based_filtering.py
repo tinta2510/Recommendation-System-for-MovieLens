@@ -1,9 +1,9 @@
 import numpy as np
 from numpy import ndarray
 from sklearn.linear_model import Ridge
-
+from math import sqrt
 class ContentBasedFiltering:
-    def __init__(self, n_users: int, n_items: int, item_features: ndarray):
+    def __init__(self, n_users: int, n_items: int, item_features: ndarray, alpha=0.01):
         """
         
         Args:
@@ -11,10 +11,13 @@ class ContentBasedFiltering:
             n_items (int): Number of items.
             item_features (ndarray): Array of item features.
                 Shape (n_items, n_features).
+            alpha (float): Regularization parameter for Ridge regression.
+                Default is 0.01.
         """
         self.n_users = n_users
         self.n_items = n_items
         self.item_features = item_features
+        self.alpha = alpha
         self.n_features = item_features.shape[1]
         self.W = None
         self.b = None
@@ -33,7 +36,7 @@ class ContentBasedFiltering:
             # Get ratings of the current user
             user_ratings = training_ratings[training_ratings[:, 0] == user_id, :]
             
-            model = Ridge(alpha=0.01, fit_intercept=True)
+            model = Ridge(alpha=self.alpha, fit_intercept=True)
             # Note that item_id is 1-indexed
             rated_item_ids = user_ratings[:, 1]
             model.fit(self.item_features[rated_item_ids-1, :], user_ratings[:, 2])
@@ -57,4 +60,4 @@ class ContentBasedFiltering:
         for user_id, item_id, rating in test_ratings:
             sum_squared_error += (rating - self.predict(user_id, item_id)) ** 2
         mse = sum_squared_error / len(test_ratings)
-        return np.sqrt(mse)
+        return sqrt(mse)

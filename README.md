@@ -94,12 +94,12 @@ The experiments are conducted on the MovieLens 100k dataset, and the results are
 | Model                   | Train RMSE | Test RMSE |
 |-------------------------|------------|-----------|
 | user_based_CF           | 1.0474     | 1.0595    |
-| content_based_filtering | 0.9103     | 1.0543    |
 | matrix_factorization_CF | 1.0296     | 1.0437    |
 | item_based_CF           | 1.0154     | 1.0432    |
-| MLP                     | 0.8931     | 0.9389    |
-| GMF                     | 0.8287     | 0.9353    |
-| NCF                     | 0.8381     | 0.9212    |
+| content_based_filtering | 0.9621     | 1.0230    |
+| MLP                     | 0.8901     | 0.9379    |
+| GMF                     | 0.8397     | 0.9374    |
+| NCF                     | 0.7511     | 0.9203    |
 
 ![evaluation](images/evaluation.png)
 

@@ -22,6 +22,7 @@ class GMF(nn.Module):
         self.for_NeuMF = for_NeuMF
         self.user_embed = nn.Embedding(n_users, n_factors)
         self.item_embed = nn.Embedding(n_items, n_factors)
+        self.n_factors = n_factors
         if not self.for_NeuMF:
             self.linear = nn.Linear(n_factors, 1)
             self.sigmoid = nn.Sigmoid()
@@ -44,26 +45,3 @@ class GMF(nn.Module):
             out = self.linear(out)
             out = (self.sigmoid(out)*5).view(-1)
         return out
-
-if __name__=="__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    for i in range(1, 6):
-        training_filepath = f'./data/ml-100k/u{i}.base'
-        testing_filepath = f'./data/ml-100k/u{i}.test'
-        
-        training_dataset = RatingDataset(training_filepath)
-        testing_dataset = RatingDataset(testing_filepath)
-        
-        training_dataloader = DataLoader(training_dataset, batch_size=32, shuffle=True)
-        testing_dataloader = DataLoader(testing_dataset, batch_size=32, shuffle=False)
-        
-        model = GMF(943, 1682, n_factors).to(device)
-        criterion = nn.MSELoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        
-        train(model, training_dataloader, criterion, optimizer, device)
-        loss, rmse = evaluate(model, training_dataloader, criterion, device)
-        print(f"Dataset {i} - Training: Loss: {loss}, RMSE: {rmse}")
-        loss, rmse = evaluate(model, testing_dataloader, criterion, device)
-        print(f"Dataset {i} - Testing: Loss: {loss}, RMSE: {rmse}")
-        

@@ -17,7 +17,7 @@ class MLP(nn.Module):
         self.for_NeuMF = for_NeuMF
         self.user_embed = nn.Embedding(n_users, hidden_layers[0]//2)
         self.item_embed = nn.Embedding(n_items, hidden_layers[0]//2)
-        
+        self.hidden_layers = hidden_layers
         mlp = []
         for i in range(len(hidden_layers)-1):
             mlp.append(nn.Linear(hidden_layers[i], hidden_layers[i+1]))
@@ -52,23 +52,3 @@ class MLP(nn.Module):
             output = self.predict_layer(output)
             output = (self.sigmoid(output)*5).view(-1)
         return output
-
-if __name__=="__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    for i in range(1, 6):
-        training_filepath = f'./data/ml-100k/u{i}.base'
-        testing_filepath = f'./data/ml-100k/u{i}.test'
-        
-        training_dataset = RatingDataset(training_filepath)
-        testing_dataset = RatingDataset(testing_filepath)
-        
-        training_dataloader = DataLoader(training_dataset, batch_size=32, shuffle=True)
-        testing_dataloader = DataLoader(testing_dataset, batch_size=32, shuffle=False)
-        
-        model = MLP(943, 1682, [128, 64, 32, 16, 8])
-        criterion = nn.MSELoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        
-        train(model, training_dataloader, criterion, optimizer, device)
-        loss, rmse = evaluate(model, testing_dataloader, criterion, device)
-        print(f"Dataset {i}: Loss: {loss}, RMSE: {rmse}")

@@ -36,7 +36,7 @@ class NeuralCF(nn.Module):
         self.relu_GMF = nn.ReLU()
         self.relu_MLP = nn.ReLU()
         
-        self.neuMF_layer = nn.Linear(n_factors_GMF + hidden_layers_MLP[-1], 1)
+        self.neuMF_layer = nn.Linear(self.GMF.n_factors + self.MLP.hidden_layers[-1], 1)
         self.sigmoid = nn.Sigmoid()
         
         self._init_weight()
@@ -52,26 +52,3 @@ class NeuralCF(nn.Module):
         out = self.neuMF_layer(concat_out)
         out = (self.sigmoid(out)*5).view(-1)
         return out
-        
-if __name__=="__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    learning_rate = 0.001
-    n_factors_GMF = 8
-    hidden_layers_MLP = [32, 16, 8]
-    for i in range(1, 6):
-        training_filepath = f'./data/ml-100k/u{i}.base'
-        testing_filepath = f'./data/ml-100k/u{i}.test'
-        
-        training_dataset = RatingDataset(training_filepath)
-        testing_dataset = RatingDataset(testing_filepath)
-        
-        training_dataloader = DataLoader(training_dataset, batch_size=32, shuffle=True)
-        testing_dataloader = DataLoader(testing_dataset, batch_size=32, shuffle=False)
-        
-        model = NeuralCF(943, 1682, n_factors_GMF, hidden_layers_MLP).to(device)
-        criterion = nn.MSELoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        
-        train(model, training_dataloader, criterion, optimizer, device)
-        loss, rmse = evaluate(model, testing_dataloader, criterion, device)
-        print(f"Dataset {i}: Loss: {loss}, RMSE: {rmse}")

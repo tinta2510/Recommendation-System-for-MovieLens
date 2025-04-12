@@ -103,7 +103,7 @@ The experiments are conducted on the MovieLens 100k dataset, and the results are
 
 ![evaluation](images/evaluation.png)
 
-The details of the experiments can be found in [src/experiments.ipynb](src/experiments.ipynb).
+The details of the experiments can be found in [src/model_evaluation.ipynb](src/model_evaluation.ipynb).
 
 The results show that NCF outperforms the other models in terms of RMSE. Other deep learning-based models like GMF and MLP also perform better than content-based filtering, neibourhood-based CF and matrix factorization. This indicates that deep learning-based models generalizes better to unseen data. This reusult is likely due to their ability to capture non-linear user-item interactions as compared to traditional methods.
 
